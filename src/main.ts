@@ -16,6 +16,13 @@ const startButton = document.querySelector("#start_button")!;
 const logo = document.querySelector("#logo")!;
 const cover = document.querySelector("#cover")!;
 
+let isOn = false;
+const checkbox = document.querySelector("#checkbox")! as HTMLInputElement;
+checkbox.addEventListener("change", (e) => {
+  // @ts-ignore
+  isOn = e.target?.checked;
+});
+
 const handleStart = () => {
   console.log("start");
   startButton.classList.add("hidden");
@@ -74,7 +81,7 @@ render.canvas.addEventListener("mousemove", function(event) {
   placeholderPosition = { x: mouseX, y: 100 };
 });
 let isMouseDown = false;
-let rotate = 0;
+// let rotate = 0;
 render.canvas.addEventListener("mousedown", function() {
   isMouseDown = true;
 });
@@ -90,7 +97,7 @@ render.canvas.addEventListener("mouseup", function(event) {
 
 function animate() {
   if (isMouseDown) {
-    rotate += 0.05; // 0.05は増加させる値
+    // rotate += 0.05; // 0.05は増加させる値
   }
   requestAnimationFrame(animate);
 }
@@ -176,7 +183,7 @@ function createBox(x: number, y: number) {
         },
         friction: 1, // 摩擦係数を1に設定
         density: 1,
-        mass: 30,
+        // mass: 10,
       });
       data = hangyodon;
       break;
@@ -241,7 +248,7 @@ function createBox(x: number, y: number) {
         },
         friction: 1, // 摩擦係数を1に設定
         density: 1,
-        mass: 30,
+        mass: 10,
       });
       data = keisukesan;
       break;
@@ -320,7 +327,7 @@ function createBox(x: number, y: number) {
       data = box2;
   }
   index++;
-  Matter.Body.rotate(data, rotate);
+  // Matter.Body.rotate(data, rotate);
   Composite.add(engine.world, [data]);
 }
 // create runner
@@ -341,7 +348,9 @@ function checkIfBoxesFell() {
     // 床のY座標よりも下にある場合
     if (body.position.y > ground.position.y) {
       // ボックスが床から落ちたと判定
-      window.alert("GAME OVER");
+      if (!isOn) {
+        window.alert("GAME OVER");
+      }
       // 必要に応じて、ボックスを世界から削除
       Matter.Composite.remove(engine.world, body);
     }
