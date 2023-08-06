@@ -75,7 +75,7 @@ render.canvas.addEventListener("mousemove", function(event) {
 });
 let isMouseDown = false;
 let rotate = 0;
-render.canvas.addEventListener("mousedown", function(event) {
+render.canvas.addEventListener("mousedown", function() {
   isMouseDown = true;
 });
 
