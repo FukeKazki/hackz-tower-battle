@@ -12,6 +12,18 @@ import Turuturu from "./turuturu.png";
 import Nagi from "./nagi.png";
 import { vertice } from "./constant";
 
+const startButton = document.querySelector("#start_button")!;
+const logo = document.querySelector("#logo")!;
+const cover = document.querySelector("#cover")!;
+
+const handleStart = () => {
+  console.log("start");
+  startButton.classList.add("hidden");
+  logo.classList.add("hidden");
+  cover.classList.add("hidden");
+};
+
+startButton.addEventListener("click", handleStart);
 const Engine = Matter.Engine,
   Render = Matter.Render,
   Runner = Matter.Runner,
@@ -24,28 +36,33 @@ const render = Render.create({
   element: document.getElementById("app")!,
   engine: engine,
   options: {
-    width: 800,
-    height: 1000,
+    width: window.innerWidth,
+    height: window.innerHeight,
     wireframes: false,
   },
 });
 
 const canvas = {
-  width: 800,
-  height: 1000,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
-// create two boxes and a ground
-// const boxA = Bodies.rectangle(400, 200, 80, 80);
-// const boxB = Bodies.rectangle(450, 50, 80, 80);
+
 // 床 うごかないように
 // x, y, width, height, options
 const ground = Bodies.rectangle(canvas.width / 2, 950, 700, 60, {
   isStatic: true,
-  friction: 10,
+  friction: 1,
+  mass: 100,
 });
-
+// ground の左側 についている壁
+const leftWall = Bodies.rectangle(canvas.width / 2 - 350, 890, 60, 60, {
+  isStatic: true,
+});
+const rightWall = Bodies.rectangle(canvas.width / 2 + 350, 890, 60, 60, {
+  isStatic: true,
+});
 // add all of the bodies to the world
-Composite.add(engine.world, [ground]);
+Composite.add(engine.world, [ground, leftWall, rightWall]);
 var placeholderPosition: any = null;
 // run the renderer
 Render.run(render);
@@ -56,7 +73,14 @@ render.canvas.addEventListener("mousemove", function(event) {
 
   placeholderPosition = { x: mouseX, y: 100 };
 });
+let isMouseDown = false;
+let rotate = 0;
 render.canvas.addEventListener("mousedown", function(event) {
+  isMouseDown = true;
+});
+
+render.canvas.addEventListener("mouseup", function(event) {
+  isMouseDown = false;
   var rect = render.canvas.getBoundingClientRect();
   var scaleX = render.canvas.width / rect.width;
   var mouseX = (event.clientX - rect.left) * scaleX;
@@ -64,16 +88,48 @@ render.canvas.addEventListener("mousedown", function(event) {
   createBox(mouseX, 100);
 });
 
+function animate() {
+  if (isMouseDown) {
+    rotate += 0.05; // 0.05は増加させる値
+  }
+  requestAnimationFrame(animate);
+}
+
+animate();
+
 Matter.Events.on(render, "afterRender", function() {
   if (placeholderPosition) {
     var context = render.context;
-    context.fillStyle = "rgba(255, 0, 0, 0.5)"; // 薄い赤色
-    context.fillRect(
+    const images = [
+      Hackz,
+      Hangyodon,
+      Nakayubi,
+      NagiIssei,
+      KeisukesanHappy,
+      Keisukesan,
+      Keisukesanface,
+      Keisukesanreverse,
+      Nagi,
+      Turuturu,
+    ];
+    const imageData = images[index % images.length];
+    const image = new Image();
+    image.src = imageData;
+
+    context.drawImage(
+      image,
       placeholderPosition.x - 40,
       placeholderPosition.y - 40,
       80,
       80,
     );
+    // context.fillStyle = "rgba(255, 0, 0, 0.5)"; // 薄い赤色
+    // context.fillRect(
+    //   placeholderPosition.x - 40,
+    //   placeholderPosition.y - 40,
+    //   80,
+    //   80,
+    // );
   }
 });
 
@@ -103,7 +159,9 @@ function createBox(x: number, y: number) {
             yScale: 1,
           },
         },
-        friction: 5, // 摩擦係数を1に設定
+        friction: 1, // 摩擦係数を1に設定
+        density: 1,
+        mass: 30,
       });
       data = box;
       break;
@@ -116,7 +174,9 @@ function createBox(x: number, y: number) {
             yScale: 1.2,
           },
         },
-        friction: 5, // 摩擦係数を1に設定
+        friction: 1, // 摩擦係数を1に設定
+        density: 1,
+        mass: 30,
       });
       data = hangyodon;
       break;
@@ -129,7 +189,9 @@ function createBox(x: number, y: number) {
             yScale: 1,
           },
         },
-        friction: 5, // 摩擦係数を1に設定
+        friction: 1, // 摩擦係数を1に設定
+        density: 1,
+        mass: 30,
       });
       data = nakayubi;
       break;
@@ -138,11 +200,13 @@ function createBox(x: number, y: number) {
         render: {
           sprite: {
             texture: NagiIssei,
-            xScale: 1,
-            yScale: 1,
+            xScale: 0.8,
+            yScale: 0.8,
           },
         },
-        friction: 5, // 摩擦係数を1に設定
+        friction: 1, // 摩擦係数を1に設定
+        density: 1,
+        mass: 30,
       });
       data = nagiissei;
       break;
@@ -159,7 +223,9 @@ function createBox(x: number, y: number) {
               yScale: 1,
             },
           },
-          friction: 5, // 摩擦係数を1に設定
+          friction: 1, // 摩擦係数を1に設定
+          density: 1,
+          mass: 30,
         },
       );
       data = keisukesanhappy;
@@ -173,7 +239,9 @@ function createBox(x: number, y: number) {
             yScale: 1,
           },
         },
-        friction: 5, // 摩擦係数を1に設定
+        friction: 1, // 摩擦係数を1に設定
+        density: 1,
+        mass: 30,
       });
       data = keisukesan;
       break;
@@ -186,7 +254,9 @@ function createBox(x: number, y: number) {
             yScale: 1,
           },
         },
-        friction: 5, // 摩擦係数を1に設定
+        friction: 1, // 摩擦係数を1に設定
+        density: 1,
+        mass: 30,
       });
       data = nagi;
       break;
@@ -203,7 +273,9 @@ function createBox(x: number, y: number) {
               yScale: 1.4,
             },
           },
-          friction: 5, // 摩擦係数を1に設定
+          friction: 1, // 摩擦係数を1に設定
+          density: 1,
+          mass: 30,
         },
       );
       data = keisukesanreverse;
@@ -221,7 +293,9 @@ function createBox(x: number, y: number) {
               yScale: 1.4,
             },
           },
-          friction: 5, // 摩擦係数を1に設定
+          friction: 1, // 摩擦係数を1に設定
+          density: 1,
+          mass: 30,
         },
       );
       data = keisukesanface;
@@ -235,7 +309,9 @@ function createBox(x: number, y: number) {
             yScale: 1.0,
           },
         },
-        friction: 5, // 摩擦係数を1に設定
+        friction: 1, // 摩擦係数を1に設定
+        density: 1,
+        mass: 30,
       });
       data = turuturu;
       break;
@@ -244,6 +320,7 @@ function createBox(x: number, y: number) {
       data = box2;
   }
   index++;
+  Matter.Body.rotate(data, rotate);
   Composite.add(engine.world, [data]);
 }
 // create runner
@@ -264,9 +341,7 @@ function checkIfBoxesFell() {
     // 床のY座標よりも下にある場合
     if (body.position.y > ground.position.y) {
       // ボックスが床から落ちたと判定
-      console.log("A box has fallen off the ground!");
-      window.alert("A box has fallen off the ground!");
-
+      window.alert("GAME OVER");
       // 必要に応じて、ボックスを世界から削除
       Matter.Composite.remove(engine.world, body);
     }
